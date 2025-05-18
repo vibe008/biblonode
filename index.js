@@ -14,7 +14,8 @@ const app = express();
 connectDB();
 
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: 'https://bibloadminnew-ii730vuc5-vibe008s-projects.vercel.app', 
+    // origin: 'http://localhost:3000', 
     credentials: true
 }));
 

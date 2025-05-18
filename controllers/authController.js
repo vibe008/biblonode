@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
     if (user) {
       user.lastLogin = new Date();
       user.isLoggedIn = true;
-      await user.save(); // ✅ Save the changes to the database
+      await user.save(); //
     }
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
