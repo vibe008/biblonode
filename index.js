@@ -12,11 +12,20 @@ const bcrypt = require("bcrypt");
 dotenv.config();
 const app = express();
 connectDB();
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://bibloadminnew-ii730vuc5-vibe008s-projects.vercel.app',
+];
 
 app.use(cors({
-    origin: 'https://bibloadminnew-ii730vuc5-vibe008s-projects.vercel.app', 
-    // origin: 'http://localhost:3000', 
-    credentials: true
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true, // if you are using cookies or auth headers
 }));
 
 const superAdminCreation = async () => {
