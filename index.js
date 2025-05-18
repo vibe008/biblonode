@@ -17,7 +17,7 @@ connectDB();
 // Allow specific origins for CORS
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://bibloadminnew-ii730vuc5-vibe008s-projects.vercel.app',
+  'https://bibloadminnew.vercel.app',
 ];
 
 // Set CORS before routes
