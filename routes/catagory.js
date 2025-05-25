@@ -5,6 +5,7 @@ const {Createcatagory ,getAllCatagory ,editCatagory ,deleteCatagory}  = require(
 router.post("/createcatagory", Createcatagory)
 router.get("/GetAllcatagory", getAllCatagory)
 router.put("/editCatagory/:id", editCatagory); 
+
 router.delete("/deleteCatagory/:id", deleteCatagory); 
 
 module.exports = router;

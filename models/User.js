@@ -13,6 +13,10 @@ const userSchema = new mongooes.Schema(
       enum: ['user', 'admin', 'superadmin'],
       default: 'user',
     },
+    fromGoogle: {
+      type: Boolean,
+      default: false,
+    },
     lastLogin: Date,
     lastLogout: Date
   },

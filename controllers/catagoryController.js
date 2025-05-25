@@ -1,17 +1,19 @@
 const Category = require("../models/Category");
-
+const slugify = require('slugify');
 // Create a new category
 exports.Createcatagory = async (req, res) => {
   try {
     const { name } = req.body;
-
+          
     // Optional: check for duplicate
     const existing = await Category.findOne({ name });
     if (existing) {
       return res.status(400).json({ message: "Category already exists" });
     }
 
-    const category = await Category.create({ name });
+    const category = await Category.create({ name ,
+      slug: slugify(name)
+    });
 
     res.status(201).json({ message: "Category created", category });
   } catch (error) {

@@ -7,7 +7,7 @@ const crypto = require('crypto');
 exports.register = async (req, res) => {
   try {
     console.log("req.body", req.body)
-    const { username, email, passward } = req.body;
+    const { username, email, passward, fromGoogle } = req.body;
     const hasedPassward = await bcrypt.hash(passward, salt);
     if (!email || email.trim() === "") {
       return res.status(400).json({ message: "Email is required" })
@@ -16,24 +16,38 @@ exports.register = async (req, res) => {
     if (exiexistUser) {
       return res.status(409).json({ message: "User already exists" });
     }
-    const verificationToken = crypto.randomBytes(32).toString("hex");
+    // if (!username || username.trim() === "") {
+    //   username = email.split('@')[0]; // or "GoogleUser"
+    // }
+    const verificationToken = fromGoogle ? null : crypto.randomBytes(32).toString("hex");
     const user = await User.create({
       username,
       email,
       passward: hasedPassward,
       verificationToken,
+      isVerified: fromGoogle ? true : false, 
+      fromGoogle: fromGoogle ? true : false, 
       role: "user"
     });
-    const verificationLink = `http://localhost:5000/api/auth/verify/${verificationToken}`;
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Verify your email",
-      html: `<p>Hello ${username}, click the link to verify: <a href="${verificationLink}">${verificationLink}</a></p>`,
+    if (!fromGoogle) {
+      const verificationLink = `http://localhost:5000/api/auth/verify/${verificationToken}`;
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Verify your email",
+        html: `<p>Hello ${username}, click the link to verify: <a href="${verificationLink}">${verificationLink}</a></p>`,
+      });
+    }
+
+
+    return res.status(201).json({
+      message: fromGoogle
+        ? "Google user registered successfully"
+        : "User registered. Please verify your email.",
+      user,
     });
 
-    return res.status(201).json({ message: "User registered. Please verify your email.", user });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -44,7 +58,9 @@ exports.regiserAdmin = async (req, res) => {
     const { username, email, passward } = req.body
     const exiexistUser = User.findOne({ email: email })
     if (!exiexistUser) return await res.status(409).json({ message: "User already exists" })
-
+    if (!username || username.trim() === "") {
+      username = email.split('@')[0]; // or "GoogleUser"
+    }
     const hasedPassward = await bcrypt.hash(passward, salt);
     if (!email || email.trim() === "") {
       return res.status(400).json({ message: "Email is required" })

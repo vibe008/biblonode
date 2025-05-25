@@ -19,18 +19,8 @@ exports.createPost = async (req, res) => {
     const categories = JSON.parse(req.body.categories || "[]");
     const tags = JSON.parse(req.body.tags || "[]");
 
-    const categoryIds = categories.map(cat => cat.value); 
-    const tagIds = tags.map(tag => tag.value);         
-
-    // const categories = JSON.parse(req.body.categories || "[]");
-    // const tags = JSON.parse(req.body.tags || "[]");
-
-    // const categoryDocs = await Category.find({ name: { $in: categories } });
-    // const categoryIds = categoryDocs.map(cat => cat._id);
-
-    // const tagDocs = await Tags.find({ name: { $in: tags } });
-    // const tagIds = tagDocs.map(tag => tag._id);
-
+    const categoryIds = categories.map(cat => cat.value);
+    const tagIds = tags.map(tag => tag.value);
 
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -52,7 +42,7 @@ exports.createPost = async (req, res) => {
       categories: categoryIds,
       tags: tagIds,
       voiceurl: req.file ? req.file.path : null,
-      isvarified:false
+      isvarified: false
     });
 
     res.status(201).json(post);
@@ -62,17 +52,71 @@ exports.createPost = async (req, res) => {
   }
 };
 
+exports.getlatestpost = async (req, res) => {
+  try {
+    const posts = await Post.find().populate([
+      { path: 'categories', select: 'name slug' },
+      { path: 'tags', select: 'name slug' },
+    ]);
+    if (!posts) return res.status(400).json({ message: "No Latest Post Found" })
+    res.status(200).json(posts)
 
+    console.log("posts", posts)
+  } catch (error) {
+    res.status(500).json({ message: err.message });
+  }
+}
 
 exports.getPostBySlug = async (req, res) => {
   try {
-    const post = await Post.findOne({ slug: req.params.slug });
+    const post = await Post.findOne({ slug: req.params.slug }).populate('categories tags');
     if (!post) return res.status(404).json({ message: "Post not found" });
     res.status(200).json(post);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getpostbycatagoryslug = async (req, res) => {
+  try {
+    console.log("Slug received:", req.params.slug); 
+
+    const category = await Category.findOne({ slug: req.params.slug });
+    if (!category) return res.status(404).json({ message: "Category not found" });
+
+    const posts = await Post.find({ categories: category._id }).populate('categories tags');
+    res.status(200).json({ posts });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts by category", error });
+  }
+}
+
+exports.getpostbytagslug = async (req, res) => {
+  try {
+    console.log("Slug received:", req.params.slug); // Debug line
+
+    const tag = await Tags.findOne({ slug: req.params.slug });
+    if (!tag) return res.status(404).json({ message: "tag not found" });
+
+    const posts = await Post.find({ tags: tag._id }).populate('categories tags');
+    res.status(200).json({ posts });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts by category", error });
+  }
+}
+exports.getpostbyuserID = async (req, res) => {
+  try {
+
+    const user = await User.findOne({ id: req.params.id });
+    if (!user) return res.status(404).json({ message: "tag not found" });
+
+    const posts = await Post.find({ userId: user._id }).populate('categories tags');
+    res.status(200).json({ posts });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts by category", error });
+  }
+}
+
 
 exports.getPostsByCategory = async (req, res) => {
   try {
@@ -93,7 +137,7 @@ exports.getPostByUserID = async (req, res) => {
     const user = await User.findById(req.params.userId);
     console.log("user", user)
     if (!user) return res.status(404).json({ message: "User not found" })
-    const post = await Post.find({ userId: user._id }).populate("categories");
+    const post = await Post.find({ userId: user._id }).populate("categories tags");
     res.status(200).json(post);
   } catch (error) {
     res.status(500).json({ message: error.message });

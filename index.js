@@ -6,6 +6,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const postRoutes = require("./routes/posts");
 const tagRoutes = require("./routes/tags");
+const userPostUserRoutes = require('./routes/user')
 const catagoryRoutes = require("./routes/catagory");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
@@ -17,6 +18,7 @@ connectDB();
 // Allow specific origins for CORS
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001',
   'https://bibloadminnew.vercel.app',
 ];
 
@@ -44,6 +46,7 @@ app.set('trust proxy', 1);
 app.use("/api/auth", authRoutes);
 app.use("/api/catagory", catagoryRoutes);
 app.use("/api/tag", tagRoutes);
+app.use("/api/user", userPostUserRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/uploads", express.static('uploads'));
 
@@ -58,6 +61,7 @@ const superAdminCreation = async () => {
       passward: hashed,
       role: "superadmin",
       isVerified: true,
+      fromGoogle:false
     });
     console.log("✅ Super admin created");
   } else {
