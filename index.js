@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth");
 const postRoutes = require("./routes/posts");
 const tagRoutes = require("./routes/tags");
 const userPostUserRoutes = require('./routes/user')
+const SearchRouter = require('./routes/search')
 const catagoryRoutes = require("./routes/catagory");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
@@ -20,6 +21,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'https://bibloadminnew.vercel.app',
+  "https://udhmee-opt1.vercel.app/"
 ];
 
 // Set CORS before routes
@@ -48,6 +50,7 @@ app.use("/api/catagory", catagoryRoutes);
 app.use("/api/tag", tagRoutes);
 app.use("/api/user", userPostUserRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api", SearchRouter);
 app.use("/uploads", express.static('uploads'));
 
 // Superadmin creation
