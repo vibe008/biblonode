@@ -21,7 +21,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'https://bibloadminnew.vercel.app',
-  "https://udhmee-opt1.vercel.app"
+  "udhmee-xolu.vercel.app"
 ];
 
 // Set CORS before routes
